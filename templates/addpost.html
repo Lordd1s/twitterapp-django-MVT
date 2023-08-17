@@ -1,0 +1,21 @@
+{% extends "home.html" %}
+
+{% block main %}
+
+<form action="{% url 'add_post' %}" method="post" enctype="multipart/form-data">
+    {% if error %}
+        <label for="">{{ error }}</label>
+    {% endif %}
+    {% csrf_token %}
+    <label for="title">Заголовок</label>
+    <input type="text" name="title" id="title" placeholder="Заголовок" minlength="3" required>
+
+    <label for="description">Описание</label>
+    <textarea name="description" id="description" placeholder="Описание" required rows="10"></textarea>
+
+    <input type="file" accept=".png, .jpg, .jpeg" name="image" id="" >
+    
+    <input type="submit" name="" value="Отправить">
+</form>
+
+{% endblock main %}

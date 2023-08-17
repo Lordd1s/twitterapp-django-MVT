@@ -1,0 +1,17 @@
+<nav id="sideNav">
+
+  <a href="{% url 'home' %}" class="nav-link"
+    ><i class="bi bi-house"></i>Главная</a>
+  <a href="{% url 'news' %}" class="nav-link"><i class="bi bi-newspaper"></i>Новости</a>
+
+  {% if request.user.is_authenticated %}
+  <a href="{% url 'all_posts' %}" class="nav-link">
+    <i class="bi bi-file-post"></i>Посты
+  </a>
+
+  <a href="{% url 'add_post' %}" class="nav-link">
+    <i class="bi bi-file-plus"></i>Добавить пост
+  </a>
+
+  {% endif %}
+</nav>

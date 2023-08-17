@@ -1,0 +1,16 @@
+<header>
+    <!-- TODO Do this with JS -->
+    <span id="up" class="hidden" onclick="toUp()" >Наверх</span>
+
+    <!-- condition with jinja -->
+    {% if request.user.is_authenticated %}
+      <span>Привет {{ request.user.username }}</span>
+      <a href="{% url 'logout' %}">Выйти</a>
+    {% else %}
+      <span>Привет Гость</span>
+      <div class="auth">
+        <a href="{% url 'login' %}">Войти</a> |
+        <a href="{% url 'register' %}">Регистрация</a>
+      </div>
+    {% endif %}
+</header>

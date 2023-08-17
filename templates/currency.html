@@ -1,0 +1,32 @@
+{% extends "home.html" %}
+{% load static %}
+
+{% block main %}
+
+<section class="card">
+        <div class="posts">
+                <div class="username">
+                    <div class="alll">
+                        <div class="rate name">
+                            {% for atrs in currency.atr %}
+                            <span>{{ atrs }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="rate buy">
+                            {% for buy in currency.buy %}
+                            <span>Покупка: {{ buy }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="rate sell">
+                            {% for sell in currency.sell %}
+                            <span>Продажа: {{ sell }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+
+
+                </div>
+        </div>
+</section>
+{% endblock %}

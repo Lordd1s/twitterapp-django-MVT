@@ -1,0 +1,50 @@
+{% extends "home.html" %}
+{% load static %}
+{% load customtags %}
+
+{% block main %}
+
+{% if error %}
+<span>
+  {{ error }}
+</span>
+{% endif %}
+
+{% if not posts%}
+<h1 style="text-align: center;">Нету постов! Создайте <a href="{% url 'add_post' %}">первыми!</a></h1>
+{% else %}
+<h3 style="color: #fffffe; text-align: center; text-shadow: 0 0 2px;">Количество постов: {{ post_count }}</h3>
+{% endif %}
+<div class="search">
+    <form action="{% url 'all_posts' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="text" name="search" placeholder="Поиск по заголовкам!">
+        <input type="submit" value="Искать">
+</div>
+{% for post in posts %}
+
+<section class="card">
+    <div class="posts">
+            <div class="username">
+              <span>{{ post.author }}</span>
+            </div>
+
+            <div class="post">
+              <span><a href="{% url 'detail_post' post.id %}">{{ post.title }} {{ test_beautify_tag | digit_beautify}}</a></span>
+              <span>{{ post.description }}</span>
+              {% if post.image %}
+                <img src="{% static post.image.url %}" alt="img">
+              {% endif %}
+            </div>
+            
+            <div class="rating">
+              <a href="{% url 'delete_post' post.id %}"><i class="bi bi-trash"></i>Delete</a>
+              <a href="{% url 'update_post' post.id %}"><i class="bi bi-recycle"></i>Update</a>
+              <span>{{ post.date_created | format_datetime:"date" }}</span>
+            </div>
+
+          </div>
+  </section>
+{% endfor %}
+
+{% endblock main %}
