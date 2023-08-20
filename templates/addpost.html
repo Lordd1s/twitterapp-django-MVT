@@ -1,5 +1,5 @@
 {% extends "home.html" %}
-
+{% block title %} <title>Добавление поста</title> {% endblock %}
 {% block main %}
 
 <form action="{% url 'add_post' %}" method="post" enctype="multipart/form-data">

@@ -1,7 +1,7 @@
 {% extends "home.html" %}
 {% load static %}
 {% load customtags %}
-
+{% block title %} <title>Пост {{ detail.title }}</title> {% endblock %}
 {% block main %}
 <section class="card">
     <div class="posts">
@@ -35,7 +35,7 @@
             <div class="comment">
                 <form action="{% url 'comment_create' detail.id %}" method="post" enctype="multipart/form-data">
                   {% csrf_token %}
-                   <input type="text" name="comment" placeholder="Комментарий">
+                   <input type="text" name="comment" placeholder="Комментарий" style="color: white;">
                    <button type="submit">Отправить</button> 
                 </form>
                 
@@ -45,25 +45,6 @@
           </div>
   </section>
 
-            {% if comments %}
-              <div class="card">
-                {% for comment in comments%}
-                <div class="comments">
-                  <span>{{ comment.author }}</span>
-                  <span>{{ comment.comment }}</span>
-                    <a href="{% url 'comment_rating' comment.id 1 %}"><i class="bi bi-heart"></i></a>
-                    {% if count_rating == 0 %}
-                    <span style="color: grey; font-size: clamp(3px, 1vw, 30px); ">{{ comments_rating }} | {{ count_comments_r }} - оценки</span>
-                    {% elif count_rating > 0 %}
-                    <span style="color: rgb(0, 23, 198); font-size: clamp(3px, 1vw, 30px);">{{ comments_rating }} | {{ count_comments_r }} - оценки</span>
-                    {% else %}
-                    <span style="color: rgb(197, 4, 4); font-size: clamp(3px, 1vw, 30px);">{{ comments_rating }} | {{ count_comments_r }} - оценки</span>
-                    {% endif %}
-                    <a href="{% url 'comment_rating' comment.id 1 %}"><i class="bi bi-dash-circle"></i></a>
-                  <span>{{ comment.comment_data }}</span>
-                  <a href="{% url 'comment_delete' comment.id %}"><i class="bi bi-trash"></i></a>
-                </div>
-                {% endfor %}
-              </div>
-            {% endif %}
+{% include "components/comments_rating.html" %}
+
 {% endblock %}

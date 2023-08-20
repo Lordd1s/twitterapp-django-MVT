@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.http import request
 from django.utils import timezone
 
 
@@ -42,9 +41,7 @@ class Comment(models.Model):
     author = models.ForeignKey(
         to=User, verbose_name="Автор коммента", on_delete=models.CASCADE
     )
-    post_id = models.ForeignKey(
-        to=Post, verbose_name="ID Поста", on_delete=models.CASCADE
-    )
+    post = models.ForeignKey(to=Post, verbose_name="ID Поста", on_delete=models.CASCADE)
     comment = models.TextField(verbose_name="Комментарии", max_length=200)
     comment_data = models.DateTimeField(
         verbose_name="Дата комментирования", default=timezone.now()
@@ -59,12 +56,25 @@ class Comment(models.Model):
     def __str__(self):
         return f"{self.author} - оставил коментарий по этой дате -> {self.comment_data}"
 
+    def get_current_comment_rating(self):
+        # print(self)
+        ratings = CommentRatings.objects.filter(comment=self)
+        likes = ratings.filter(status=True).count()
+        dislikes = ratings.filter(status=False).count()
+        rating = likes - dislikes
+
+        return rating
+
+    def get_comments_ratings_count(self):
+        ratings = CommentRatings.objects.filter(comment=self).count()
+        return ratings
+
 
 class CommentRatings(models.Model):
     author = models.ForeignKey(
         to=User, verbose_name="Автор лайка", on_delete=models.CASCADE
     )
-    comment_id = models.ForeignKey(
+    comment = models.ForeignKey(
         to=Comment, verbose_name="ID Коммента", on_delete=models.CASCADE
     )
     status = models.BooleanField(default=False)

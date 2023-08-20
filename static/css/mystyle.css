@@ -103,7 +103,7 @@ nav {
   justify-content: flex-start;
   font-size: clamp(16px, 3vw, 30px);
   z-index: 2;
-  transition: 0.7s ease;
+  transition: 0.3s ease;
   overflow: hidden;
   text-align: start;
 }

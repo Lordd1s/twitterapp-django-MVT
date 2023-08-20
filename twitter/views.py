@@ -224,21 +224,7 @@ def detail_post(request: HttpRequest, pk: str) -> HttpResponse:
 
         count_r = post_rating_objs.count()
 
-        comments = models.Comment.objects.filter(post_id=int(pk))
-
-        comment_ratings_counts = {}  # Создаем словарь для хранения количества оценок для каждого комментария
-
-        comment_rate = models.CommentRatings.objects.filter(comment_id=int(pk))
-
-        for comment in comments:
-            comment_rating = (
-                    comment_rate.filter(status=True).count()
-                    - comment_rate.filter(status=False) .count()
-            )
-            count_comments = comment_rate.count()
-
-            comment_ratings_counts[comment.id] = count_comments
-
+        comments = models.Comment.objects.filter(post=int(pk))
 
         return render(
             request=request,
@@ -248,8 +234,6 @@ def detail_post(request: HttpRequest, pk: str) -> HttpResponse:
                 "comments": comments,
                 "count_r": count_r,
                 "rating": rating,
-                "count_comments_r": comment_ratings_counts,
-                "comments_rating": comment_rate
             },
         )
     else:
@@ -268,7 +252,7 @@ def comment_create(request: HttpRequest, pk: str) -> HttpResponse:
         post = models.Post.objects.get(id=int(pk))
 
         # Создаем комментарий и связываем его с конкретным постом
-        models.Comment.objects.create(author=author, post_id=post, comment=comment)
+        models.Comment.objects.create(author=author, post=post, comment=comment)
 
         return redirect(reverse("detail_post", args=[pk]))
 
@@ -277,7 +261,7 @@ def comment_delete(request: HttpRequest, pk: str) -> HttpResponse:
     """Delete a comment"""
     if request.method == "GET":
         comment = get_object_or_404(Comment, id=int(pk))
-        post_pk = comment.post_id.pk
+        post_pk = comment.post.pk
         comment.delete()
         return redirect(reverse("detail_post", args=[post_pk]))
 
@@ -290,11 +274,11 @@ def comment_rating(request, pk: str, status) -> HttpResponse:
         author_obj = request.user
         status = True if int(status) == 1 else False
         comment_rating_objs = models.CommentRatings.objects.filter(
-            comment_id=comment_obj, author=author_obj
+            comment=comment_obj, author=author_obj
         )
         if len(comment_rating_objs) <= 0:
             models.CommentRatings.objects.create(
-                comment_id=comment_obj, author=author_obj, status=status
+                comment=comment_obj, author=author_obj, status=status
             )
         else:
             comment_rating_obj = comment_rating_objs[0]
@@ -305,7 +289,8 @@ def comment_rating(request, pk: str, status) -> HttpResponse:
             else:
                 comment_rating_obj.status = status
                 comment_rating_obj.save()
-        return redirect(reverse("detail_post", args=[pk]))
+
+        return redirect(reverse("detail_post", args=[comment_obj.post.id]))
 
 
 def rating(request: HttpRequest, pk: str, status) -> HttpResponse:
