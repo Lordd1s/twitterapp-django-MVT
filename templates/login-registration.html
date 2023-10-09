@@ -11,17 +11,18 @@
 
 	<div class="main">
 		<input type="checkbox" id="chk" aria-hidden="true">
-			{% if error %}
-				<div class="error">
-        			{{ error }}
-    			</div>
-			{% endif %}
-
-
+			<button><a href="{% url 'home' %}">< К главной странице!</a></button>
 			<div class="signup">
 				<form action="{% url 'register' %}" method="post">
 					{% csrf_token %}
+					{% if error %}
+					<div class="error">
+        				{{ error }}
+						{{ condition}}
+    				</div>
+					{% else %}
 					<label for="chk" aria-hidden="true">Зарегистрироваться</label>
+					{% endif %}
 					<input type="text" name="username" placeholder="Никнейм" required="">
 					<input type="email" name="email" placeholder="Почта" required="">
 					<input type="password" name="password" placeholder="Пароль" required="" minlength="8">
@@ -38,6 +39,7 @@
 					<button type="submit">Войти</button>
 				</form>
 			</div>
+			
 	</div>
 </body>
 </html>

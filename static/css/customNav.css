@@ -1,0 +1,121 @@
+/* HEADER STYLES */
+.header {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 17.5em; /* Ширина бокового меню */
+  background: #9470db7c;
+  z-index: 999; /* Поднимаем меню наверх */
+}
+
+/* LOGO STYLES */
+.logo {
+  text-align: center;
+  padding: 1em 0;
+  margin: 0;
+}
+
+.logo a {
+  display: inline-block;
+  color: #DFDBD9;
+  text-decoration: none;
+  transition: 0.15s linear color;
+}
+
+.logo a:hover {
+  color: #fff;
+}
+
+.logo span {
+  font-weight: 700;
+  transition: 0.15s linear color;
+}
+
+/* MAIN NAV */
+.nav-wrap {
+  padding-top: 2em; /* Отступ сверху для контента */
+}
+
+.main-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+
+.main-nav li {
+  border-bottom: solid 1px #8A2BE2;
+}
+
+.main-nav a {
+  display: block;
+  padding: 1.1em 0;
+  color: #DFDBD9;
+  font: 400 1.125em 'Source Sans Pro', Helvetica, Arial, sans-serif;
+  text-align: center;
+  text-decoration: none;
+  transition: 0.15s linear color;
+}
+
+.main-nav a:hover {
+  color: #fff;
+}
+
+/* HOVER SLIDE EFFECT */
+.list-hover-slide li {
+  position: relative;
+  overflow: hidden;
+}
+
+.list-hover-slide a {
+  display: block;
+  position: relative;
+  z-index: 1;
+  transition: 0.35s ease color;
+}
+
+.list-hover-slide a:before {
+  content: '';
+  display: block;
+  z-index: -1;
+  position: absolute;
+  left: -100%;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border-right: solid 5px #DF4500;
+  background: #1E90FF;
+  transition: 0.35s ease left;
+}
+
+.list-hover-slide a.is-current,
+.list-hover-slide a:hover {
+  &:before {
+    left: 0;
+  }
+}
+
+/* Медиа-запросы для адаптивности */
+@media screen and (max-width: 768px) {
+  .header {
+    position: static; /* Отменяем фиксацию для мобильных устройств */
+    width: auto; /* Автоматическая ширина */
+  }
+
+  .nav-wrap {
+    padding-top: 0; /* Убираем отступ для мобильных устройств */
+  }
+
+  .main-nav ul {
+    text-align: left; /* Выравниваем текст влево для мобильных устройств */
+  }
+
+  .main-nav li {
+    border: none; /* Убираем границы между элементами для мобильных устройств */
+  }
+
+  .main-nav a {
+    padding: 1em 20px; /* Увеличиваем отступы для мобильных устройств */
+  }
+}

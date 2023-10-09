@@ -2,13 +2,15 @@
 {% load static %}
 
 {% block main %}
+{% include "components/paginator.html" %}
 {% for item in news %}
 <section class="card">
         <div class="posts">
                 <div class="username">
-                    <span>{{ item.span}} | <a style="text-decoration: underline;" href="{{ item.a }}">Подробнее...</a></span>
+                    <span>{{ item.span}} | <a style="text-decoration: underline;" href="{{ item.a }}" target="_blank">Подробнее...</a></span>
                 </div>
         </div>
 </section>
 {% endfor %}
+{% include "components/paginator.html" %}
 {% endblock %}

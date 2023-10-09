@@ -12,10 +12,10 @@
         <span style="color: grey; font-size: 1.5rem; ">{{ comment.get_current_comment_rating }} | {{ comment.get_comments_ratings_count }} - оценки</span>
 
         {% elif comment.get_current_comment_rating  > 0 %}
-        <span style="color: rgb(0, 23, 198); font-size: 1.5rem;">{{ comment.get_current_comment_rating }} | {{ comment.get_comments_ratings_count }} - оценки</span>
+        <span style="color: #573b8a; font-size: 1.5rem;">{{ comment.get_current_comment_rating }} | {{ comment.get_comments_ratings_count }} - оценки</span>
 
         {% else %}
-        <span style="color: rgb(197, 4, 4); font-size: 1.5rem;">{{ comment.get_current_comment_rating }} | {{ comment.get_comments_ratings_count }} - оценки</span>
+        <span style="color: rgb(223, 77, 77); font-size: 1.5rem;">{{ comment.get_current_comment_rating }} | {{ comment.get_comments_ratings_count }} - оценки</span>
         {% endif %}
 
         <a href="{% url 'comment_rating' comment.id -1 %}"><i class="bi bi-dash-circle" style="font-size: 1.5rem;"></i></a>

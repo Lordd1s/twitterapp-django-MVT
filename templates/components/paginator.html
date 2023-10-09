@@ -1,0 +1,46 @@
+<div class="container">
+  <div>
+    <ul>
+      {% if news.number != 1 %}
+          <li>
+              <a href="?page=1" class="page-link">«« Первая</a>
+          </li>
+      {% endif %}
+
+      {% if news.has_previous %}
+        <li>
+          <a href="?page={{ news.previous_page_number }}" class="page-link">« Предыдущая</a>
+        </li>
+      {% else %}
+        <li class="disabled">
+          <a href="#" onclick="return false" class="page-link">« Предыдущая</a>
+        </li>
+      {% endif %}
+
+      {% for page_number in news.paginator.page_range %}
+          {% if page_number == news.number %}
+              <li class="disabled"><a class="page-link" href="?page={{ page_number }}" onclick="return false">{{ page_number }}</a></li>
+          {% else %}
+              <li class="enabled"><a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a></li>
+          {% endif %}
+      {% endfor %}
+
+      {% if news.has_next %}
+          <li class="page-item">
+              <a href="?page={{ news.next_page_number }}" class="page-link">Следующая »</a>
+          </li>
+      {% else %}
+          <li class="disabled">
+              <a href="#" onclick="return false" class="page-link">Следующая »</a>
+          </li>
+      {% endif %}
+
+      {% if news.number != news.paginator.num_pages %}
+          <li class="page-item">
+              <a href="?page={{ news.paginator.num_pages }}" class="page-link">Последняя »»</a>
+          </li>
+      {% endif %}
+
+    </ul>
+  </div>
+</div>

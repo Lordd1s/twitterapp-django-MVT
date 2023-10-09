@@ -4,7 +4,7 @@ from twitter import views
 
 urlpatterns = [
     path("", views.home, name="home"),
-    path("login/", views.login_user, name="login"),
+    path("accounts/login/", views.login_user, name="login"),
     path("register/", views.register, name="register"),
     path("logout/", views.logout_user, name="logout"),
     path("add/", views.add_post, name="add_post"),
@@ -16,6 +16,10 @@ urlpatterns = [
     path("comment_delete/<str:pk>/", views.comment_delete, name="comment_delete"),
     path("rating/<str:pk>/<str:status>/", views.rating, name="rating"),
     path("news/", views.news, name="news"),
-    path("comments_rating/<str:pk>/<str:status>/", views.comment_rating, name="comment_rating"),
+    path(
+        "comments_rating/<str:pk>/<str:status>/",
+        views.comment_rating,
+        name="comment_rating",
+    ),
     path("currency", views.currency, name="currency"),
 ]

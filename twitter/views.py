@@ -1,7 +1,9 @@
 import random
+import re
 
 import bcrypt  # password hashing library
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpRequest, Http404
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.models import User
@@ -25,6 +27,10 @@ def register(request: HttpRequest) -> HttpResponse:
     elif request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
+        regex_password = (
+            r"^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-_]).{8,}$"
+        )
+        regex_email = r"[A-Za-z0-9._-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}"
         email = request.POST.get("email")
 
         if not (username and password and email):
@@ -51,15 +57,27 @@ def register(request: HttpRequest) -> HttpResponse:
             )
 
         # Create the new user
-        hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-        new_user = User.objects.create_user(
-            username=username, password=hashed_password, email=email
-        )
+        if re.match(regex_password, string=password) and re.match(
+            regex_email, string=email
+        ):
+            hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+            new_user = User.objects.create_user(
+                username=username, password=hashed_password, email=email
+            )
 
-        # Log in the newly registered user
-        login(request, user=new_user)
-        print("successfully created new user")
-        return redirect(reverse("home"))
+            # Log in the newly registered user
+            login(request, user=new_user)
+            print("successfully created new user")
+            return redirect(reverse("home"))
+        else:
+            return render(
+                request=request,
+                template_name="login-registration.html",
+                context={
+                    "error": "Почта или пароль не соответсвует требованием!",
+                    "condition": "Пароль должен содержать мин. 8 символов, одна заглавная буква, одна цифра, спец. символы: #?!@$%^&*-_",
+                },
+            )
 
 
 def login_user(request: HttpRequest) -> HttpResponse:
@@ -80,7 +98,6 @@ def login_user(request: HttpRequest) -> HttpResponse:
         user = authenticate(
             username=username,
             password=password,
-            # password=bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()),
         )
 
         if user is not None:
@@ -96,13 +113,14 @@ def login_user(request: HttpRequest) -> HttpResponse:
             )
 
 
-def logout_user(request: HttpRequest) -> redirect:
+def logout_user(request: HttpRequest) -> HttpResponse:
     """Logout a user."""
     logout(request)
 
     return redirect(reverse("home"))
 
 
+@login_required
 def all_posts(request: HttpRequest) -> HttpResponse:
     """Returns all the posts"""
     posts = models.Post.objects.all().filter(is_moderate=True).order_by("-date_created")
@@ -134,6 +152,7 @@ def all_posts(request: HttpRequest) -> HttpResponse:
             )
 
 
+@login_required
 def add_post(request: HttpRequest) -> HttpResponse:
     """Add a post"""
     if request.method == "GET":
@@ -168,6 +187,7 @@ def add_post(request: HttpRequest) -> HttpResponse:
         )
 
 
+@login_required
 def delete_post(request: HttpRequest, pk: str) -> HttpResponse:
     """Delete a post"""
     if request.method == "GET":
@@ -182,6 +202,7 @@ def delete_post(request: HttpRequest, pk: str) -> HttpResponse:
         )
 
 
+@login_required
 def update_post(request: HttpRequest, pk: str) -> HttpResponse:
     """Update a post"""
     if request.method == "GET":
@@ -210,6 +231,7 @@ def update_post(request: HttpRequest, pk: str) -> HttpResponse:
         return redirect(reverse("all_posts"))
 
 
+@login_required
 def detail_post(request: HttpRequest, pk: str) -> HttpResponse:
     """Post detail"""
     if request.method == "GET":
@@ -240,6 +262,7 @@ def detail_post(request: HttpRequest, pk: str) -> HttpResponse:
         return HttpResponse("404 Not Found", status=404)
 
 
+@login_required
 def comment_create(request: HttpRequest, pk: str) -> HttpResponse:
     """Create a new comment"""
     if request.method == "POST":
@@ -257,6 +280,7 @@ def comment_create(request: HttpRequest, pk: str) -> HttpResponse:
         return redirect(reverse("detail_post", args=[pk]))
 
 
+@login_required
 def comment_delete(request: HttpRequest, pk: str) -> HttpResponse:
     """Delete a comment"""
     if request.method == "GET":
@@ -266,6 +290,7 @@ def comment_delete(request: HttpRequest, pk: str) -> HttpResponse:
         return redirect(reverse("detail_post", args=[post_pk]))
 
 
+@login_required
 def comment_rating(request, pk: str, status) -> HttpResponse:
     """comment ratings"""
 
@@ -293,6 +318,7 @@ def comment_rating(request, pk: str, status) -> HttpResponse:
         return redirect(reverse("detail_post", args=[comment_obj.post.id]))
 
 
+@login_required
 def rating(request: HttpRequest, pk: str, status) -> HttpResponse:
     """post ratings"""
 
@@ -322,14 +348,24 @@ def rating(request: HttpRequest, pk: str, status) -> HttpResponse:
 
 
 def news(request: HttpRequest) -> HttpResponse:
+    news = utils.CustomPaginator.paginate(
+        utils.CustomCache.caching("cache_key", lambda_func=utils.news, timeout=60 * 30),
+        request=request,
+    )
     return render(
-        request=request, template_name="news.html", context={"news": utils.news()}
+        request=request,
+        template_name="news.html",
+        context={"news": news},
     )
 
 
 def currency(request: HttpRequest) -> HttpResponse:
+    currency = utils.CustomCache.caching(
+        "currency", lambda_func=utils.get_rates, timeout=1 * 5
+    )
+
     return render(
         request=request,
         template_name="currency.html",
-        context={"currency": utils.get_rates()},
+        context={"currency": currency},
     )

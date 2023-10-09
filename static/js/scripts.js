@@ -27,14 +27,3 @@ function handleScroll() {
 
 window.addEventListener('scroll', handleScroll);
 
-const nav = document.getElementById('sideNav');
-const navLinks = document.querySelectorAll('.nav-link');
-
-nav.addEventListener('mouseenter', () => {
-  navLinks.forEach(link => link.classList.add('show-text'));
-});
-
-nav.addEventListener('mouseleave', () => {
-  navLinks.forEach(link => link.classList.remove('show-text'));
-});
-

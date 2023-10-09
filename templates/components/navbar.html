@@ -1,17 +1,44 @@
-<nav id="sideNav">
+<header class="header" role="banner">
+  <h1 class="logo">
+    <span id="up" class="hidden" onclick="toUp()">Наверх</span>
+    {% if request.user.is_authenticated %}
+    <span>Привет {{ request.user.username }}</span>
+    <a href="{% url 'logout' %}">Выйти</a>
+    {% else %}
+    <span>Привет Гость</span>
+    <a href="{% url 'login' %}">Войти</a>
+    <a href="{% url 'register' %}">Регистрация</a>
+    {% endif %}
+  </h1>
+  <div class="nav-wrap">
+    <nav class="main-nav" role="navigation">
+      <ul class="unstyled list-hover-slide">
+        <li>
+          <a href="{% url 'home' %}" class="nav-link"
+            ><i class="bi bi-house"></i>Главная</a
+          >
+        </li>
+        <li>
+          <a href="{% url 'news' %}" class="nav-link"
+            ><i class="bi bi-newspaper"></i>Новости</a
+          >
+        </li>
+        {% if request.user.is_authenticated %}
 
-  <a href="{% url 'home' %}" class="nav-link"
-    ><i class="bi bi-house"></i>Главная</a>
-  <a href="{% url 'news' %}" class="nav-link"><i class="bi bi-newspaper"></i>Новости</a>
+        <li>
+          <a href="{% url 'all_posts' %}" class="nav-link">
+            <i class="bi bi-file-post"></i>Посты
+          </a>
+        </li>
 
-  {% if request.user.is_authenticated %}
-  <a href="{% url 'all_posts' %}" class="nav-link">
-    <i class="bi bi-file-post"></i>Посты
-  </a>
+        <li>
+          <a href="{% url 'add_post' %}" class="nav-link">
+            <i class="bi bi-file-plus"></i>Добавить пост
+          </a>
+        </li>
 
-  <a href="{% url 'add_post' %}" class="nav-link">
-    <i class="bi bi-file-plus"></i>Добавить пост
-  </a>
-
-  {% endif %}
-</nav>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+</header>
