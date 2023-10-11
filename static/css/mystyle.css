@@ -217,3 +217,9 @@ input[type="submit"]:hover {
     color: #c1c1c1;
     cursor: not-allowed;
 }
+
+@media screen and (max-width: 768px)  {
+  .disabled, .enabled, .page-item {
+    font-size: 0.8rem;
+  }
+}

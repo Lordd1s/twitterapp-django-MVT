@@ -30,7 +30,7 @@
             </div>
 
             <div class="post">
-              <span><a href="{% url 'detail_post' post.id %}">{{ post.title }} {{ test_beautify_tag | digit_beautify}}</a></span>
+              <span><a href="{% url 'detail_post' post.id %}">{{ post.title }}</a></span>
               <span>{{ post.description }}</span>
               {% if post.image %}
                 <img src="{% static post.image.url %}" alt="img">

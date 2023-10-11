@@ -131,7 +131,6 @@ def all_posts(request: HttpRequest) -> HttpResponse:
             template_name="posts.html",
             context={
                 "posts": posts,
-                "test_beautify_tag": random.randint(1000000, 9999999),
             },
         )
     elif request.method == "POST":

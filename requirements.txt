@@ -14,7 +14,9 @@ click==8.1.6
 colorama==0.4.6
 dill==0.3.7
 Django==4.2.3
+django-environ==0.11.2
 django-grappelli==3.0.7
+django-redis==5.4.0
 frozenlist==1.4.0
 idna==3.4
 isort==5.12.0
@@ -26,7 +28,9 @@ packaging==23.1
 pathspec==0.11.1
 Pillow==10.0.0
 platformdirs==3.9.1
+psycopg2==2.9.9
 pylint==2.17.5
+redis==5.0.1
 requests==2.31.0
 soupsieve==2.4.1
 sqlparse==0.4.4
