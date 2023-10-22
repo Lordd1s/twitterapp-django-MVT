@@ -1,0 +1,38 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block main %}
+<div class="container mt-4">
+    <h1 class="text-center">Отправить сообщение (Аналог почты (не чат))</h1>
+    {% if success %}
+    <h3 class="text-success text-center">{{ success }}</h3>
+    {% elif error %}
+    <h3 class="text-danger text-center">{{ error }}</h3>
+    {% endif %}
+    <form action="{% url 'message' %}" method="post" class="">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="recipient" class="form-label">Кому</label>
+            <select class="form-select bg-body-tertiary" id="recipient" name="recipient">
+                <option selected disabled value="">Выберите получателя</option>
+                {% for user in users %}
+                {% if request.user == user %}
+                <option value="{{user}}" disabled>Пользователь {{ user }}</option>
+                {% else %}
+                <option value="{{ user }}">Пользователь {{ user }}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="subject" class="form-label">Тема сообщения</label>
+            <input type="text" class="form-control bg-body-tertiary" id="subject" name="subject">
+        </div>
+        <div class="mb-3">
+            <label for="message" class="form-label">Текст сообщения</label>
+            <textarea class="bg-body-tertiary form-control" id="message" name="message" rows="5"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Отправить</button>
+    </form>
+</div>
+{% endblock %}

@@ -5,19 +5,16 @@ register = template.Library()
 
 
 @register.filter(name="format_datetime")
-def format_datetime(source: datetime.datetime, format: str = ""):  # SIMPLE TAG
+def format_datetime(source: datetime.datetime, format: str = ""): 
     """Преобразует дату в строку в формате datetime"""
 
-    # , tz_hours: float = 6.0
-    # source = source + datetime.timedelta(hours=tz_hours)
-
-    match format:  # match-case (switch-case - js/go) - хэширует(запоминает) значения своих кейсов
+    match format:  
         case "time":
             return source.strftime("%H:%M:%S")
         case "time1":
             return source.strftime("%H-%M-%S")
         case "date":
-            return source.strftime("%d.%m.%Y")
+            return source.strftime("%d.%m.%Y %H:%M")
         case "date2":
             return source.strftime("%d/%m/%Y")
         case _:

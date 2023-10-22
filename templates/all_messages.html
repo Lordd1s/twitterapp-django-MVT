@@ -1,0 +1,63 @@
+{% extends 'home.html' %} {% load static %}
+{% block title %} <title>Входящие сообщение</title> {% endblock %}
+{% block main %}
+
+<div class="mx-auto w-50 mt-5 mb-5">
+  <h3 class="text-center mb-4">Входящие сообщения</h3>
+  <div class="list-group">
+    {% if not incoming_messages %}
+      <a href="#" class="list-group-item list-group-item-action text-center">Нет входящих сообщений</a>
+    {% else %}
+      {% for message in incoming_messages %}
+        <a href="{% url 'detail_message' message.subject message.sender.id message.recipient.id %}" class="list-group-item list-group-item-action {% if not message.is_opened %} bg-info {% endif %}">
+          <h5 class="mb-1">Отправитель: {{ message.sender }}</h5>
+          <p class="mb-1">Тема: {{ message.subject }}</p>
+          <p class="mb-1">Сообщение: {{ message.text }}</p>
+          <span class="badge bg-secondary">
+            {% if message.replied %}
+              Отвечено
+            {% elif message.answered %}
+              Вам ответили!
+            {% else %}
+              Ожидает ответа
+            {% endif %}
+          </span>
+        </a>
+      {% endfor %}
+    {% endif %}
+  </div>
+</div>
+
+
+
+
+
+<div class="accordion mx-auto w-50" id="accordionExample">
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        Отправленные сообщение
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse hide" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <div class="list-group">
+          {% if not sent_messages %}
+            <a href="#" class="list-group-item list-group-item-action">Нет отправленных сообщений</a>
+          {% endif %}
+          {% for sent in sent_messages %}
+            <a href="{% url 'edit_message' sent.subject sent.sender.id sent.recipient.id %}" class="list-group-item list-group-item-action">
+              <h5 class="mb-1">Кому: {{ sent.recipient }}</h5>
+              <p class="mb-1">Тема: {{ sent.subject }}</p>
+              <p class="mb-1">Сообщение: {{ sent.text }}</p>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock %}

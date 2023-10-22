@@ -7,15 +7,15 @@
         <label for="">{{ error }}</label>
     {% endif %}
     {% csrf_token %}
-    <label for="title">Заголовок</label>
-    <input type="text" name="title" id="title" placeholder="Заголовок" minlength="3" required>
+    <label for="title" class="form-label">Заголовок</label>
+    <input class="form-control" type="text" name="title" id="title" placeholder="Заголовок" minlength="3" required>
 
-    <label for="description">Описание</label>
-    <textarea name="description" id="description" placeholder="Описание" required rows="10"></textarea>
+    <label class="form-label" for="description">Описание</label>
+    <textarea class="form-control" name="description" id="description" placeholder="Описание" required rows="10"></textarea>
 
-    <input type="file" accept=".png, .jpg, .jpeg" name="image" id="" >
+    <input class="form-control mt-4 mb-4" type="file" accept=".png, .jpg, .jpeg" name="image" id="" >
     
-    <input type="submit" name="" value="Отправить">
+    <input class="btn btn-primary" type="submit" name="" value="Отправить">
 </form>
 
 {% endblock main %}

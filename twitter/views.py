@@ -1,15 +1,16 @@
 import random
 import re
+import bcrypt
 
-import bcrypt  # password hashing library
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpRequest, Http404
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+
 from twitter import models
 from twitter.models import Post, Comment
-
 from twitter import utils
 
 
@@ -121,6 +122,167 @@ def logout_user(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+def message(request: HttpRequest) -> HttpResponse:
+    users = User.objects.all()
+    context = {"users": users, "error": "Ошибка"}
+    if request.method == "GET":
+        return render(
+            request=request, template_name="message.html", context={"users": users}
+        )
+    elif request.method == "POST":
+        recipient = request.POST.get("recipient")
+        subject = request.POST.get("subject").strip()
+        messages = request.POST.get("message").strip()
+
+        if recipient is None or subject == "" or messages == "":
+            context["error"] = "Заполните все поля"
+            return render(
+                request=request, template_name="message.html", context=context
+            )
+
+        if users.get(username=recipient) == request.user:
+            return render(
+                request=request, template_name="message.html", context=context
+            )
+
+        models.Message.objects.create(
+            sender=request.user,
+            recipient=users.get(username=recipient),
+            subject=subject,
+            text=messages,
+        )
+
+        return redirect(reverse("all_messages"))
+
+
+@login_required
+def all_messages(request: HttpRequest) -> HttpResponse:
+    mess = models.Message.objects.all()
+    to_update_status = mess.filter(recipient=request.user, is_deleted=False)
+    to_update_status.update(is_viewed=True)
+
+    context = {
+        "incoming_messages": to_update_status,
+        "sent_messages": mess.filter(sender=request.user, is_deleted=False),
+    }
+    return render(
+        request=request,
+        template_name="all_messages.html",
+        context=context,
+    )
+
+
+@login_required
+def detail_message(
+    request: HttpRequest, sender_id, recipient_id, subject=None
+) -> HttpResponse:
+    try:
+        message_detail = models.Message.objects.get(
+            sender=int(sender_id),
+            recipient=int(recipient_id),
+            subject=str(subject),
+            is_deleted=False,
+        )
+    except ValueError:
+        raise Http404("Неверный идентификатор пользователя")
+    except ObjectDoesNotExist:
+        raise Http404("Пользователь не найден")
+
+    if request.method == "GET":
+        message_detail.is_opened = True
+        message_detail.save()
+        return render(
+            request=request,
+            template_name="detail_message.html",
+            context={"details": message_detail},
+        )
+
+    elif request.method == "POST":
+        text = request.POST.get("text").strip()
+        if text == "":
+            return render(
+                request=request,
+                template_name="detail_message.html",
+                context={
+                    "details": message_detail,
+                    "error": "Поле не должно быть пустым!",
+                },
+            )
+        models.Message.objects.create(
+            sender=request.user,
+            recipient=message_detail.sender,
+            text=text,
+            subject=message_detail.subject,
+            answered=True,
+        )
+        message_detail.replied = True
+        message_detail.save()
+        return redirect(reverse("all_messages"))
+
+
+@login_required
+def delete_message(
+    request: HttpRequest,
+    sender_id: str,
+    recipient_id: str,
+    subject=None,
+) -> HttpResponse:
+    if request.method == "GET":
+        try:
+            message_delete = models.Message.objects.get(
+                sender=int(sender_id),
+                recipient=int(recipient_id),
+                is_deleted=False,
+                subject=str(subject),
+            )
+            message_delete.is_deleted = True
+            message_delete.save()
+            return redirect(reverse("all_messages"))
+        except ValueError:
+            raise Http404("Неверный идентификатор пользователя")
+        except ObjectDoesNotExist:
+            raise Http404("Пользователь не найден")
+
+
+@login_required
+def edit_message(
+    request: HttpRequest,
+    sender_id: str,
+    recipient_id: str,
+    subject=None,
+) -> HttpResponse:
+    try:
+        to_edit_message = models.Message.objects.get(
+            sender=int(sender_id),
+            recipient=int(recipient_id),
+            is_deleted=False,
+            subject=str(subject),
+        )
+    except (ValueError, models.Message.DoesNotExist):
+        raise Http404("Сообщение не найдено")
+
+    if request.method == "GET":
+        return render(request, "edit_message.html", {"details": to_edit_message})
+
+    elif request.method == "POST":
+        subject = request.POST.get("subject").strip()
+        text = request.POST.get("text").strip()
+
+        if not subject or not text:
+            return render(
+                request,
+                "edit_message.html",
+                {"details": to_edit_message, "errors": "Заполните все поля!"},
+            )
+
+        to_edit_message.subject = subject
+        to_edit_message.text = text
+        to_edit_message.is_edited = True
+        to_edit_message.save()
+        return redirect(reverse("all_messages"))
+
+
+@login_required
 def all_posts(request: HttpRequest) -> HttpResponse:
     """Returns all the posts"""
     posts = models.Post.objects.all().filter(is_moderate=True).order_by("-date_created")
@@ -160,7 +322,6 @@ def add_post(request: HttpRequest) -> HttpResponse:
         title = request.POST.get("title").strip()
         description = request.POST.get("description").strip()
         image = request.FILES.get("image", None)
-        print(image)
 
         if len(title or description) <= 3:
             return render(
@@ -348,7 +509,7 @@ def rating(request: HttpRequest, pk: str, status) -> HttpResponse:
 
 def news(request: HttpRequest) -> HttpResponse:
     news = utils.CustomPaginator.paginate(
-        utils.CustomCache.caching("cache_key", lambda_func=utils.news, timeout=60 * 30),
+        utils.CustomCache.caching("news", lambda_func=utils.news, timeout=60 * 30),
         request=request,
     )
     return render(

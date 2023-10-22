@@ -15,25 +15,42 @@
       <ul class="unstyled list-hover-slide">
         <li>
           <a href="{% url 'home' %}" class="nav-link"
-            ><i class="bi bi-house"></i>Главная</a
+            ><i class="bi bi-house"></i> <span>Главная</span></a
           >
         </li>
         <li>
           <a href="{% url 'news' %}" class="nav-link"
-            ><i class="bi bi-newspaper"></i>Новости</a
+            ><i class="bi bi-newspaper"></i> <span>Новости</span></a
           >
         </li>
         {% if request.user.is_authenticated %}
 
         <li>
           <a href="{% url 'all_posts' %}" class="nav-link">
-            <i class="bi bi-file-post"></i>Посты
+            <i class="bi bi-file-post"></i> <span>Посты</span>
           </a>
         </li>
 
         <li>
           <a href="{% url 'add_post' %}" class="nav-link">
-            <i class="bi bi-file-plus"></i>Добавить пост
+            <i class="bi bi-file-plus"></i> <span>Добавить пост</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="{% url 'all_messages' %}" class="nav-link">
+            <i class="bi bi-chat-right-text"></i> Все сообщении
+            {% if message_status_count > 0 %}
+            <span class="badge bg-danger">{{ message_status_count }}</span>
+            {% else %}
+            <span></span>
+            {% endif %}
+          </a>
+        </li>
+
+        <li>
+          <a href="{% url 'message' %}" class="nav-link">
+            <i class="bi bi-chat-right-text"></i> <span>Отправить сообщение</span>
           </a>
         </li>
 

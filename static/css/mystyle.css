@@ -127,20 +127,6 @@ label {
   margin: 1%;
 }
 
-input,
-textarea {
-  padding: 1%;
-  margin: 1%;
-  border-radius: 5px;
-  outline: none;
-  resize: none;
-  font-size: 1.3rem;
-  background-color: #dedede;
-  border: none;
-  box-shadow: 0 0 5px #fffffe14;
-  color: #001b2b;
-}
-
 input[type="submit"] {
   background: transparent;
   color: #dedede;

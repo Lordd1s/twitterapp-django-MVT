@@ -1,9 +1,74 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+from django.core.validators import FileExtensionValidator
 
 
 # Create your models here.
+
+
+class UserProfile(models.Model):
+    """User profile"""
+
+    user = models.OneToOneField(to=User, on_delete=models.CASCADE)
+    avatar = models.ImageField(
+        upload_to="images/avatars",
+        blank=True,
+        null=True,
+        verbose_name="Аватар",
+        validators=[
+            FileExtensionValidator(allowed_extensions=["jpg", "png", "gif", "jpeg"]),
+        ],
+    )
+    was_born = models.DateTimeField(null=True, blank=True, verbose_name="Дата рождения")
+    first_name = models.CharField(max_length=50, blank=True, verbose_name="Имя")
+    last_name = models.CharField(max_length=50, blank=True, verbose_name="Фамилия")
+
+    class Meta:
+        app_label = "twitter"
+        ordering = ("-was_born", "user")
+        verbose_name = "Профиль"
+        verbose_name_plural = "Профили"
+
+    def __str__(self):
+        return f"Профиль {self.user}"
+
+
+class Message(models.Model):
+    sender = models.ForeignKey(
+        to=User,
+        related_name="sent_messages",
+        on_delete=models.CASCADE,
+        verbose_name="Отправитель",
+    )
+    recipient = models.ForeignKey(
+        to=User,
+        related_name="received_messages",
+        on_delete=models.CASCADE,
+        verbose_name="Получатель",
+    )
+    subject = models.CharField(
+        max_length=200, blank=True, null=True, verbose_name="Тема сообщений"
+    )
+    text = models.TextField(verbose_name="Текст сообщений", blank=False)
+    timestamp = models.DateTimeField(default=timezone.now)
+    answered = models.BooleanField(default=False)
+    replied = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
+    is_edited = models.BooleanField(default=False)
+    is_opened = models.BooleanField(default=False)
+    is_viewed = models.BooleanField(default=False)
+
+    class Meta:
+        app_label = "twitter"
+        ordering = ["-timestamp", "subject"]
+        verbose_name = "Сообщение"
+        verbose_name_plural = "Сообщения"
+
+    def __str__(self):
+        return f"Сообщение {self.sender} -> {self.recipient}"
+
+
 class Post(models.Model):
     """Post model"""
 
@@ -13,7 +78,11 @@ class Post(models.Model):
     title = models.CharField(max_length=200, verbose_name="Заголовок")
     description = models.TextField(max_length=1000, verbose_name="Описание")
     image = models.ImageField(
-        upload_to="images/posts", verbose_name="Изображение", default=None
+        upload_to="images/posts",
+        verbose_name="Изображение",
+        default=None,
+        null=True,
+        blank=True,
     )
     date_created = models.DateTimeField(
         default=timezone.now, verbose_name="Дата создания"
@@ -44,7 +113,7 @@ class Comment(models.Model):
     post = models.ForeignKey(to=Post, verbose_name="ID Поста", on_delete=models.CASCADE)
     comment = models.TextField(verbose_name="Комментарии", max_length=200)
     comment_data = models.DateTimeField(
-        verbose_name="Дата комментирования", default=timezone.now()
+        verbose_name="Дата комментирования", default=timezone.now
     )
 
     class Meta:

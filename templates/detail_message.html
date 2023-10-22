@@ -1,0 +1,35 @@
+{% extends "home.html" %}
+{% load customtags %}
+{% block title %}<title>Детальнее</title>{% endblock %}
+
+{% block main %}
+<section class="card">
+      <div class="posts">
+        <div class="username">
+          <span>Отправитель: {{ details.sender }}</span>
+        </div>
+  
+        <div class="post">
+          <span> Тема: {{ details.subject }}</span>
+          <span>Текст: {{ details.text }}</span>
+        </div>
+        
+        <div class="rating mb-5">
+          <span>Время отправлении: {{ details.timestamp | format_datetime:"date" }}</span>
+        </div>
+
+        <div>
+          <form action="{% url 'detail_message' details.subject details.sender.id details.recipient.id %}" method="post">
+            {% csrf_token %}
+            {% if error %}
+            <h4 class="h4 text-center text-danger">{{ error }}</h4>
+            {% endif %}
+            <label for="" class="form-label h3">Ответить:</label>
+            <input class="form-control mb-4" type="text" name="text" >
+            <button class="btn btn-outline-light" type="submit">Отправить</button>
+          </form>
+          <button type="button" class="mx-auto mb-2 d-block btn btn-outline-danger"><a href="{% url 'delete_message' details.subject details.sender.id details.recipient.id %}">Удалить сообщение!</a></button>
+        </div>
+      </div>
+  </section>
+{% endblock %}

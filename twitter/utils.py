@@ -10,7 +10,28 @@ from django.http import HttpRequest
 HEADERS = """Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)Version/13.0.3 Mobile/15E148 Safari/604.1 """
 
 
-# DatabaseCache = caches["database"]
+def youtube_downloader():
+    url = "https://youtube-to-mp315.p.rapidapi.com/download"
+
+    querystring = {
+        "url": "https://www.youtube.com/watch?v=zyG9Nh_PH38",
+        "format": "mp3",
+    }
+
+    payload = {}
+    headers = {
+        "content-type": "application/json",
+        "X-RapidAPI-Key": "0dfa65d3a6msh001128cf6c62649p17ad77jsn11c5482a7f03",
+        "X-RapidAPI-Host": "youtube-to-mp315.p.rapidapi.com",
+    }
+
+    response = requests.post(
+        url, json=payload, headers=headers, params=querystring
+    ).json()
+
+    return response["link"]
+
+
 cache = caches["default"]
 
 
@@ -18,7 +39,10 @@ def news():
     response = requests.get(
         url="https://vgtimes.ru/news/", headers={"User-Agent": HEADERS}
     ).text
-
+    response2 = requests.get(
+        url="https://vgtimes.ru/news/", headers={"User-Agent": HEADERS}
+    )
+    print(response2.status_code)
     soup = BeautifulSoup(response, "html.parser")
 
     news_items = soup.find_all("div", class_="item-name")
@@ -104,5 +128,7 @@ class CustomPaginator:
 
 
 if __name__ == "__main__":
-    news()
-    get_rates()
+    # news()
+    # get_rates()
+    # youtube_downloader()
+    ...
