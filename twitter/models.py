@@ -19,8 +19,9 @@ class UserProfile(models.Model):
         validators=[
             FileExtensionValidator(allowed_extensions=["jpg", "png", "gif", "jpeg"]),
         ],
+        default="6596121.png",
     )
-    was_born = models.DateTimeField(null=True, blank=True, verbose_name="Дата рождения")
+    was_born = models.DateField(null=True, blank=True, verbose_name="Дата рождения")
     first_name = models.CharField(max_length=50, blank=True, verbose_name="Имя")
     last_name = models.CharField(max_length=50, blank=True, verbose_name="Фамилия")
 

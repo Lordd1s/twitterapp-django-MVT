@@ -81,6 +81,34 @@ def register(request: HttpRequest) -> HttpResponse:
             )
 
 
+@login_required
+def profile(request: HttpRequest) -> HttpResponse:
+    profile_db = models.UserProfile.objects.get(user=request.user)
+    if request.method == "GET":
+        return render(
+            request=request,
+            template_name="profile.html",
+            context={"profile": profile_db},
+        )
+    elif request.method == "POST":
+        avatar = request.FILES.get("avatar")
+        first_name = request.POST.get("first_name")
+        last_name = request.POST.get("last_name")
+        profile_db.avatar = avatar
+        profile_db.first_name = first_name
+        profile_db.last_name = last_name
+        profile_db.save()
+        return redirect(reverse("profile"))
+
+
+@login_required
+def delete_profile(request: HttpRequest) -> HttpResponse:
+    user = models.User.objects.get(username=request.user)
+    logout(request)
+    user.delete()
+    return redirect(reverse("home"))
+
+
 def login_user(request: HttpRequest) -> HttpResponse:
     """Login a user."""
     if request.method == "GET":

@@ -5,6 +5,8 @@ from twitter import views
 urlpatterns = [
     path("", views.home, name="home"),
     path("accounts/login/", views.login_user, name="login"),
+    path("profile/", views.profile, name="profile"),
+    path("delete_profile", views.delete_profile, name="delete_profile"),
     path("register/", views.register, name="register"),
     path("logout/", views.logout_user, name="logout"),
     path("send_message/", views.message, name="message"),

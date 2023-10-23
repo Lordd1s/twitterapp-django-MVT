@@ -1,0 +1,53 @@
+{% extends 'home.html' %} {% load static %}
+{% block title %} <title>Профиль</title> {% endblock %}
+{% block main %}
+<div class="container">
+  <h1 class="mb-4">Профиль пользователя {{ profile.user.username }}</h1>
+  <div class="row">
+      <div class="col-md-4">
+          <!-- Аватар пользователя с использованием Bootstrap классов для размера -->
+          <img src="{% static profile.avatar.url %}" class="img-fluid rounded-circle" alt="Аватар пользователя">
+      </div>
+      <div class="col-md-8">
+          <h2>Имя пользователя: {{ profile.first_name }}</h2>
+          <h2>Фамилия пользователя: {{ profile.last_name }} </h2>
+          <p>Email пользователя: {{ profile.user.email }}</p>
+          <p>Дата рождения: </p>
+          <button id="show" class="btn btn-primary mt-3">Редактировать профиль</button>
+
+          <form class="form-control bg-success-subtle" id="showForm" action="{% url 'profile' %}" enctype="multipart/form-data" method="POST" style="display: none;">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="avatar">Изменить фото</label>
+                <input type="file" class="form-control bg-primary-subtle" id="avatar" name="avatar">
+            </div>
+
+            <div class="form-group">
+                <label for="username">Имя пользователя</label>
+                <input type="text" class="form-control bg-primary-subtle" id="username" name="first_name" value="{{ profile.first_name }}">
+            </div>
+
+            <div class="form-group">
+                <label for="surname">Фамилия пользователя</label>
+                <input type="text" class="form-control bg-primary-subtle" id="surname" name="last_name" value="{{ profile.last_name }}">
+            </div>
+
+            <button type="submit" class="btn btn-outline-warning mt-3 text-dark">Сохранить изменения</button>
+        </form>
+
+        <a href="{% url 'delete_profile' %}" class="mt-3 text-dark btn btn-outline-danger">Удалить аккаунт</a>
+      </div>
+  </div>
+</div>
+<script>
+  const show = document.getElementById('show');
+  let showForm = document.getElementById('showForm');
+
+  show.onclick = function() {
+  showForm.style.display = 'block';
+  show.style.display = 'none';
+};
+</script>
+
+
+{% endblock %}

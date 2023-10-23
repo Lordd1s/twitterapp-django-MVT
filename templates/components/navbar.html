@@ -2,7 +2,7 @@
   <h1 class="logo">
     <span id="up" class="hidden" onclick="toUp()">Наверх</span>
     {% if request.user.is_authenticated %}
-    <span>Привет {{ request.user.username }}</span>
+    <span>Привет <a href="{% url 'profile' %}"> {{ request.user.username }}</a></span>
     <a href="{% url 'logout' %}">Выйти</a>
     {% else %}
     <span>Привет Гость</span>

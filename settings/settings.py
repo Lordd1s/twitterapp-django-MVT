@@ -80,7 +80,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "twitter.context_processors.get_post_count",
-                # "twitter.context_processors.get_status_of_message",
+                "twitter.context_processors.get_status_of_message",
             ],
         },
     },
