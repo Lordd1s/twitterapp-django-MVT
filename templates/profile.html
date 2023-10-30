@@ -12,10 +12,10 @@
           <h2>Имя пользователя: {{ profile.first_name }}</h2>
           <h2>Фамилия пользователя: {{ profile.last_name }} </h2>
           <p>Email пользователя: {{ profile.user.email }}</p>
-          <p>Дата рождения: </p>
+          <p>Дата рождения: {{ profile.was_born }}</p>
           <button id="show" class="btn btn-primary mt-3">Редактировать профиль</button>
 
-          <form class="form-control bg-success-subtle" id="showForm" action="{% url 'profile' %}" enctype="multipart/form-data" method="POST" style="display: none;">
+          <form class="form-control bg-primary-subtle" id="showForm" action="{% url 'profile' %}" enctype="multipart/form-data" method="POST" style="display: none;">
             {% csrf_token %}
             <div class="form-group">
                 <label for="avatar">Изменить фото</label>
@@ -31,6 +31,13 @@
                 <label for="surname">Фамилия пользователя</label>
                 <input type="text" class="form-control bg-primary-subtle" id="surname" name="last_name" value="{{ profile.last_name }}">
             </div>
+
+            {% if not profile.was_born %}
+            <div class="form-group">
+              <label for="was_born">Дата рождения</label>
+              <input type="date" class="form-control bg-primary-subtle" id="was_born" name="was_born">
+            </div>
+            {% endif %}
 
             <button type="submit" class="btn btn-outline-warning mt-3 text-dark">Сохранить изменения</button>
         </form>

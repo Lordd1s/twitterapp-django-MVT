@@ -1,6 +1,8 @@
+import datetime
 import random
 import re
 import bcrypt
+import logging
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -14,12 +16,29 @@ from twitter.models import Post, Comment
 from twitter import utils
 
 
+logger = logging.getLogger(__name__)
+
+
+def log_exceptions(view_func):
+    def wrapped_view(request, *args, **kwargs):
+        try:
+            return view_func(request, *args, **kwargs)
+        except Exception as e:
+            # Логирование ошибки
+            logger.exception("An error occurred: %s", str(e))
+            with open("log.txt", "a") as f:
+                f.write(str(e), datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+    return wrapped_view
+
+
 # Create your views here.
 def home(request: HttpRequest) -> HttpResponse:
     """Return to home page"""
     return render(request=request, template_name="home.html")
 
 
+@log_exceptions
 def register(request: HttpRequest) -> HttpResponse:
     """Register a new user."""
     if request.method == "GET":
@@ -65,6 +84,7 @@ def register(request: HttpRequest) -> HttpResponse:
             new_user = User.objects.create_user(
                 username=username, password=hashed_password, email=email
             )
+            models.UserProfile.objects.create(user=new_user)
 
             # Log in the newly registered user
             login(request, user=new_user)
@@ -82,6 +102,7 @@ def register(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@log_exceptions
 def profile(request: HttpRequest) -> HttpResponse:
     profile_db = models.UserProfile.objects.get(user=request.user)
     if request.method == "GET":
@@ -94,14 +115,17 @@ def profile(request: HttpRequest) -> HttpResponse:
         avatar = request.FILES.get("avatar")
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
+        was_born = request.POST.get("was_born")
         profile_db.avatar = avatar
         profile_db.first_name = first_name
         profile_db.last_name = last_name
+        profile_db.was_born = was_born
         profile_db.save()
         return redirect(reverse("profile"))
 
 
 @login_required
+@log_exceptions
 def delete_profile(request: HttpRequest) -> HttpResponse:
     user = models.User.objects.get(username=request.user)
     logout(request)
@@ -109,6 +133,7 @@ def delete_profile(request: HttpRequest) -> HttpResponse:
     return redirect(reverse("home"))
 
 
+@log_exceptions
 def login_user(request: HttpRequest) -> HttpResponse:
     """Login a user."""
     if request.method == "GET":
@@ -116,8 +141,9 @@ def login_user(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
-
+        # print(request.body)
         if not (username and password):
+            # print(username, password)
             return render(
                 request=request,
                 template_name="login-registration.html",
@@ -128,12 +154,15 @@ def login_user(request: HttpRequest) -> HttpResponse:
             username=username,
             password=password,
         )
+        print(user)
 
         if user is not None:
+            # print(user)
             # User is valid, and login is successful.
             login(request, user=user)
             return redirect(reverse("home"))
         else:
+            print(user)
             # Invalid login credentials.
             return render(
                 request=request,
@@ -142,6 +171,7 @@ def login_user(request: HttpRequest) -> HttpResponse:
             )
 
 
+@log_exceptions
 def logout_user(request: HttpRequest) -> HttpResponse:
     """Logout a user."""
     logout(request)
@@ -150,6 +180,7 @@ def logout_user(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@log_exceptions
 def message(request: HttpRequest) -> HttpResponse:
     users = User.objects.all()
     context = {"users": users, "error": "Ошибка"}
@@ -184,6 +215,7 @@ def message(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@log_exceptions
 def all_messages(request: HttpRequest) -> HttpResponse:
     mess = models.Message.objects.all()
     to_update_status = mess.filter(recipient=request.user, is_deleted=False)
@@ -201,6 +233,7 @@ def all_messages(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@log_exceptions
 def detail_message(
     request: HttpRequest, sender_id, recipient_id, subject=None
 ) -> HttpResponse:
@@ -249,6 +282,7 @@ def detail_message(
 
 
 @login_required
+@log_exceptions
 def delete_message(
     request: HttpRequest,
     sender_id: str,
@@ -273,6 +307,7 @@ def delete_message(
 
 
 @login_required
+@log_exceptions
 def edit_message(
     request: HttpRequest,
     sender_id: str,
@@ -311,6 +346,7 @@ def edit_message(
 
 
 @login_required
+@log_exceptions
 def all_posts(request: HttpRequest) -> HttpResponse:
     """Returns all the posts"""
     posts = models.Post.objects.all().filter(is_moderate=True).order_by("-date_created")
@@ -342,6 +378,7 @@ def all_posts(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@log_exceptions
 def add_post(request: HttpRequest) -> HttpResponse:
     """Add a post"""
     if request.method == "GET":
@@ -376,6 +413,7 @@ def add_post(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@log_exceptions
 def delete_post(request: HttpRequest, pk: str) -> HttpResponse:
     """Delete a post"""
     if request.method == "GET":
@@ -391,6 +429,7 @@ def delete_post(request: HttpRequest, pk: str) -> HttpResponse:
 
 
 @login_required
+@log_exceptions
 def update_post(request: HttpRequest, pk: str) -> HttpResponse:
     """Update a post"""
     if request.method == "GET":
@@ -420,6 +459,7 @@ def update_post(request: HttpRequest, pk: str) -> HttpResponse:
 
 
 @login_required
+@log_exceptions
 def detail_post(request: HttpRequest, pk: str) -> HttpResponse:
     """Post detail"""
     if request.method == "GET":
@@ -451,6 +491,7 @@ def detail_post(request: HttpRequest, pk: str) -> HttpResponse:
 
 
 @login_required
+@log_exceptions
 def comment_create(request: HttpRequest, pk: str) -> HttpResponse:
     """Create a new comment"""
     if request.method == "POST":
@@ -469,6 +510,7 @@ def comment_create(request: HttpRequest, pk: str) -> HttpResponse:
 
 
 @login_required
+@log_exceptions
 def comment_delete(request: HttpRequest, pk: str) -> HttpResponse:
     """Delete a comment"""
     if request.method == "GET":
@@ -479,6 +521,7 @@ def comment_delete(request: HttpRequest, pk: str) -> HttpResponse:
 
 
 @login_required
+@log_exceptions
 def comment_rating(request, pk: str, status) -> HttpResponse:
     """comment ratings"""
 
@@ -507,6 +550,7 @@ def comment_rating(request, pk: str, status) -> HttpResponse:
 
 
 @login_required
+@log_exceptions
 def rating(request: HttpRequest, pk: str, status) -> HttpResponse:
     """post ratings"""
 
@@ -535,6 +579,7 @@ def rating(request: HttpRequest, pk: str, status) -> HttpResponse:
         return HttpResponse("404 Not Found", status=404)
 
 
+@log_exceptions
 def news(request: HttpRequest) -> HttpResponse:
     news = utils.CustomPaginator.paginate(
         utils.CustomCache.caching("news", lambda_func=utils.news, timeout=60 * 30),
@@ -547,6 +592,7 @@ def news(request: HttpRequest) -> HttpResponse:
     )
 
 
+@log_exceptions
 def currency(request: HttpRequest) -> HttpResponse:
     currency = utils.CustomCache.caching(
         "currency", lambda_func=utils.get_rates, timeout=1 * 5

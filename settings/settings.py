@@ -38,7 +38,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -117,21 +117,28 @@ else:
         }
     }
 
-    # settings.py
-
     CACHES = {
         "default": {
-            "BACKEND": env("SESSION_BACKEND"),
-            "LOCATION": env("SESSION_LOCATION"),  # Адрес и порт вашего Redis-сервера
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            },
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": BASE_DIR / "customcache",
         }
     }
 
-    # Настройки сессий
-    SESSION_ENGINE = env("SESSION_ENGINE")
-    SESSION_CACHE_ALIAS = env("SESSION_CACHE_ALIAS")
+    # settings.py
+
+    # CACHES = {
+    #     "default": {
+    #         "BACKEND": env("SESSION_BACKEND"),
+    #         "LOCATION": env("SESSION_LOCATION"),  # Адрес и порт вашего Redis-сервера
+    #         "OPTIONS": {
+    #             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+    #         },
+    #     }
+    # }
+
+    # # Настройки сессий
+    # SESSION_ENGINE = env("SESSION_ENGINE")
+    # SESSION_CACHE_ALIAS = env("SESSION_CACHE_ALIAS")
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

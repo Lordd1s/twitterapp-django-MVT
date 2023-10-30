@@ -13,7 +13,7 @@
 		<input type="checkbox" id="chk" aria-hidden="true">
 			<button><a href="{% url 'home' %}">< К главной странице!</a></button>
 			<div class="signup">
-				<form action="{% url 'register' %}" method="post">
+				<form action="{% url 'register' %}" method="post" enctype="multipart/form-data">
 					{% csrf_token %}
 					{% if error %}
 					<div class="error">
@@ -31,7 +31,7 @@
 			</div>
 
 			<div class="login">
-				<form action="{% url 'login' %}" method="post">
+				<form action="{% url 'login' %}" method="post" enctype="multipart/form-data">
 					{% csrf_token %}
 					<label for="chk" aria-hidden="true">Войти</label>
 					<input type="text" name="username" placeholder="Никнейм" required="">
