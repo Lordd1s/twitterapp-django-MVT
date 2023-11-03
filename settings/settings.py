@@ -38,7 +38,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -109,7 +109,7 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": env("SQL_ENGINE"),
-            "NAME": "Django_db",
+            "NAME": "django_db",
             "USER": env("SQL_USER"),
             "PASSWORD": env("SQL_PASSWORD"),
             "HOST": "localhost",

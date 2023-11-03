@@ -1,11 +1,11 @@
 import datetime
 import random
 import re
-import bcrypt
 import logging
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import make_password
 from django.http import HttpResponse, HttpRequest, Http404
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth.models import User
@@ -80,9 +80,8 @@ def register(request: HttpRequest) -> HttpResponse:
         if re.match(regex_password, string=password) and re.match(
             regex_email, string=email
         ):
-            hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-            new_user = User.objects.create_user(
-                username=username, password=hashed_password, email=email
+            new_user = User.objects.create(
+                username=username, password=make_password(password), email=email
             )
             models.UserProfile.objects.create(user=new_user)
 
@@ -156,6 +155,11 @@ def login_user(request: HttpRequest) -> HttpResponse:
         )
         print(user)
 
+        # try:
+        #     login(request, user=user)
+        # except Exception as e:
+        #     print(e)
+
         if user is not None:
             # print(user)
             # User is valid, and login is successful.
@@ -167,7 +171,7 @@ def login_user(request: HttpRequest) -> HttpResponse:
             return render(
                 request=request,
                 template_name="login-registration.html",
-                context={"error": "Invalid credentials."},
+                context={"error": "Не существует такого пользователя."},
             )
 
 
