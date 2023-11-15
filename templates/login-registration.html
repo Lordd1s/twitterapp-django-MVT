@@ -23,9 +23,9 @@
 					{% else %}
 					<label for="chk" aria-hidden="true">Зарегистрироваться</label>
 					{% endif %}
-					<input type="text" name="username" placeholder="Никнейм" required="">
-					<input type="email" name="email" placeholder="Почта" required="">
-					<input type="password" name="password" placeholder="Пароль" required="" minlength="8">
+					<input type="text" name="username" placeholder="Никнейм" required>
+					<input type="email" name="email" placeholder="Почта" required>
+					<input type="password" name="password" placeholder="Пароль" required minlength="8">
 					<button type="submit">Зарегистрироваться</button>
 				</form>
 			</div>
@@ -34,8 +34,8 @@
 				<form action="{% url 'login' %}" method="post" enctype="multipart/form-data">
 					{% csrf_token %}
 					<label for="chk" aria-hidden="true">Войти</label>
-					<input type="text" name="username" placeholder="Никнейм" required="">
-					<input type="password" name="password" placeholder="Пароль" required="">
+					<input type="text" name="username" placeholder="Никнейм" required>
+					<input type="password" name="password" placeholder="Пароль" required>
 					<button type="submit">Войти</button>
 				</form>
 			</div>
